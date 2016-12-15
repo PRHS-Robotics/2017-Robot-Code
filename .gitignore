@@ -1,0 +1,17 @@
+#Ignore Eclipse files
+/.metadata/**/*
+/.recommenders/**/*
+/.metadata/**/*.*
+/.recommenders/**/*.*
+/.metadata/**/.*
+/.recommenders/**/.*
+
+#ignore bytecode
+/*/*.class
+
+#ignore builds
+/Globalization_bin/**/*
+/Globalization_build/**/*
+
+#ignore bundled jre
+/jre/**/*
