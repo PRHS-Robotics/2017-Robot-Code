@@ -1,7 +1,11 @@
 
 package org.usfirst.frc.team4068.robot;
 
+import org.usfirst.frc.team4068.robot.subsystems.DriveTrain;
+
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -14,6 +18,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * directory.
  */
 public class Robot extends IterativeRobot {
+	Joystick driveStick = new Joystick(1);
+	DriveTrain mainDrive = new DriveTrain();
+	
     final String defaultAuto = "Default";
     final String customAuto = "My Auto";
     String autoSelected;
@@ -64,7 +71,12 @@ public class Robot extends IterativeRobot {
      * This function is called periodically during operator control
      */
     public void teleopPeriodic() {
-        
+    	double x = driveStick.getAxis(Joystick.AxisType.kX);
+    	double y = driveStick.getAxis(Joystick.AxisType.kY);
+    	double r = driveStick.getAxis(Joystick.AxisType.kTwist);
+    	
+    	mainDrive.drive(x, y, r);
+    	
     }
     
     /**
