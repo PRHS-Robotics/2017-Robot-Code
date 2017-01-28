@@ -19,7 +19,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class Robot extends IterativeRobot {
 	Joystick driveStick = new Joystick(1);
-	DriveTrain mainDrive = new DriveTrain();
+	DriveTrain mainDrive = new DriveTrain(); 
+	
+	int uio = 0;
 	
     final String defaultAuto = "Default";
     final String customAuto = "My Auto";
@@ -56,7 +58,7 @@ public class Robot extends IterativeRobot {
      * This function is called periodically during autonomous
      */
     public void autonomousPeriodic() {
-    	switch(autoSelected) {
+    	/*switch(autoSelected) {
     	case customAuto:
         //Put custom auto code here   
             break;
@@ -64,13 +66,30 @@ public class Robot extends IterativeRobot {
     	default:
     	//Put default auto code here
             break;
+    	}*/
+    	Timer t1 = new Timer();
+    	t1.start();
+    	while (t1.get() <= 15000000) {
+    		while (t1.get() <= 6000000) {
+    			mainDrive.drive(.1, 0, 0);
+    		}
+    		while (t1.get() > 6000000 && t1.get() <= 8000000) {
+    			mainDrive.drive(0, 0, .7);
+    		}
+    		while (t1.get() > 8000000) {
+    			mainDrive.drive(.1, 0, 0);
+    		}
     	}
-    }
+    	t1.stop();
+
+        }
 
     /**
      * This function is called periodically during operator control
      */
     public void teleopPeriodic() {
+    	
+    	
     	double x = driveStick.getAxis(Joystick.AxisType.kX);
     	double y = driveStick.getAxis(Joystick.AxisType.kY);
     	double r = driveStick.getAxis(Joystick.AxisType.kTwist);
