@@ -32,15 +32,15 @@ public class DriveTrain {
 		
 		brpower = ((x)/(1 + Math.abs(y) + Math.abs(r)));
 		brpower += ((-y)/(1 + Math.abs(x) + Math.abs(r)));
-		frpower += ((r)/(1 + Math.abs(x) + Math.abs(y)));
+		brpower += ((r)/(1 + Math.abs(x) + Math.abs(y)));
 		
 		blpower = ((x)/(1 + Math.abs(y) + Math.abs(r)));
 		blpower += ((y)/(1 + Math.abs(x) + Math.abs(r)));
-		frpower += ((r)/(1 + Math.abs(x) + Math.abs(y)));
+		blpower += ((r)/(1 + Math.abs(x) + Math.abs(y)));
 		
 		flpower = ((-x)/(1 + Math.abs(y) + Math.abs(r)));
 		flpower += ((y)/(1 + Math.abs(y) + Math.abs(r)));
-		frpower += ((r)/(1 + Math.abs(x) + Math.abs(y)));
+		flpower += ((r)/(1 + Math.abs(x) + Math.abs(y)));
 		
 		frontRight.set(frpower);
 		backRight.set(brpower);
