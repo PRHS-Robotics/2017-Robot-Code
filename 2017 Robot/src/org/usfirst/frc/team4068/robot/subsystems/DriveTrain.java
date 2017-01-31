@@ -22,25 +22,29 @@ public class DriveTrain {
 		
 	}
 	
+	private static double abs(double a) {
+		return Math.abs(a);
+	}
+	
 	public void drive(double x, double y, double r){
 		double frpower, brpower, blpower, flpower;
 		
 		
-		frpower = ((-x)/(1 + Math.abs(y) + Math.abs(r)));
-		frpower += ((-y)/(1 + Math.abs(x) + Math.abs(r)));
-		frpower += ((r)/(1 + Math.abs(x) + Math.abs(y)));
+		frpower = (-x/(1 + abs(y) + abs(r)));
+		frpower += (-y/(1 + abs(x) + abs(r)));
+		frpower += (r/(1 + abs(x) + abs(y)));
 		
-		brpower = ((x)/(1 + Math.abs(y) + Math.abs(r)));
-		brpower += ((-y)/(1 + Math.abs(x) + Math.abs(r)));
-		brpower += ((r)/(1 + Math.abs(x) + Math.abs(y)));
+		brpower = (x/(1 + abs(y) + abs(r)));
+		brpower += (-y/(1 + abs(x) + abs(r)));
+		brpower += (r/(1 + abs(x) + abs(y)));
 		
-		blpower = ((x)/(1 + Math.abs(y) + Math.abs(r)));
-		blpower += ((y)/(1 + Math.abs(x) + Math.abs(r)));
-		blpower += ((r)/(1 + Math.abs(x) + Math.abs(y)));
+		blpower = (x/(1 + abs(y) + abs(r)));
+		blpower += (y/(1 + abs(x) + abs(r)));
+		blpower += (r/(1 + abs(x) + abs(y)));
 		
-		flpower = ((-x)/(1 + Math.abs(y) + Math.abs(r)));
-		flpower += ((y)/(1 + Math.abs(y) + Math.abs(r)));
-		flpower += ((r)/(1 + Math.abs(x) + Math.abs(y)));
+		flpower = (-x/(1 + abs(y) + abs(r)));
+		flpower += (y/(1 + abs(y) + abs(r)));
+		flpower += (r/(1 + abs(x) + abs(y)));
 		
 		frontRight.set(frpower);
 		backRight.set(brpower);
