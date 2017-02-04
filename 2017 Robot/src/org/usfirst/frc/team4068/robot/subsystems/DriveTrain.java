@@ -1,6 +1,7 @@
 package org.usfirst.frc.team4068.robot.subsystems;
 
 import edu.wpi.first.wpilibj.Talon;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 
 /**
@@ -9,18 +10,31 @@ import edu.wpi.first.wpilibj.Talon;
  */
 public class DriveTrain {
 
-	Talon frontRight = new Talon(1);
-	Talon backRight = new Talon(2);
-	Talon backLeft = new Talon(3);
-	Talon frontLeft = new Talon(4);
+	Talon frontRight = new Talon(3);
+	Talon backRight = new Talon(4);
+	Talon backLeft = new Talon(5);
+	Talon frontLeft = new Talon(2);
+	
+	double FLK = 1;
+	double FRK = 1;
+	double BLK = 1;
+	double BRK = 1;
+	
+	
 	
 	public DriveTrain(){
 		frontRight.setInverted(true);
 		backRight.setInverted(true);
-		backLeft.setInverted(true);
+		backLeft.setInverted(false);
 		frontLeft.setInverted(true);
 		
+		SmartDashboard.putNumber("FLK", FLK);
+		SmartDashboard.putNumber("FRK", FRK);
+		SmartDashboard.putNumber("BLK", BLK);
+		SmartDashboard.putNumber("BRK", BRK);
+		
 	}
+	
 	
 	private static double abs(double a) {
 		return Math.abs(a);
@@ -28,7 +42,6 @@ public class DriveTrain {
 	
 	public void drive(double x, double y, double r){
 		double frpower, brpower, blpower, flpower;
-		
 		
 		frpower = (-x/(1 + abs(y) + abs(r)));
 		frpower += (-y/(1 + abs(x) + abs(r)));
@@ -43,13 +56,24 @@ public class DriveTrain {
 		blpower += (r/(1 + abs(x) + abs(y)));
 		
 		flpower = (-x/(1 + abs(y) + abs(r)));
-		flpower += (y/(1 + abs(y) + abs(r)));
+		flpower += (y/(1 + abs(x) + abs(r)));
 		flpower += (r/(1 + abs(x) + abs(y)));
 		
-		frontRight.set(frpower);
-		backRight.set(brpower);
-		backLeft.set(blpower);
-		frontLeft.set(flpower);
+		SmartDashboard.getDouble("FLK", 1);
+		SmartDashboard.getDouble("FRK", 1);
+		SmartDashboard.getDouble("BLK", 1);
+		SmartDashboard.getDouble("BRK", 1);
+		
+		SmartDashboard.putNumber("Front Left", flpower * FLK);
+		SmartDashboard.putNumber("Front Right", frpower * FRK);
+		SmartDashboard.putNumber("Back Left", blpower * BLK);
+		SmartDashboard.putNumber("Back Right", brpower * BRK);
+		
+		
+		frontRight.set(frpower * FRK);
+		backRight.set(brpower * BRK);
+		backLeft.set(blpower * BLK);
+		frontLeft.set(flpower * FLK);
 			
 	}
 	
