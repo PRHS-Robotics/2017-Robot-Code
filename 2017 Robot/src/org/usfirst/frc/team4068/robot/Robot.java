@@ -2,6 +2,7 @@
 package org.usfirst.frc.team4068.robot;
 
 import org.usfirst.frc.team4068.robot.subsystems.DriveTrain;
+import org.usfirst.frc.team4068.robot.subsystems.Launcher;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
@@ -19,6 +20,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class Robot extends IterativeRobot {
 	Joystick driveStick = new Joystick(1);
+	Joystick launchStick = new Joystick(2);
+	
+	Launcher mainLauncher = new Launcher();
 	DriveTrain mainDrive = new DriveTrain(); 
 	
 	int uio = 0;
@@ -90,10 +94,18 @@ public class Robot extends IterativeRobot {
     public void teleopPeriodic() {
     	
     	
+    	
     	double x = driveStick.getAxis(Joystick.AxisType.kX);
     	double y = driveStick.getAxis(Joystick.AxisType.kY);
     	double r = driveStick.getAxis(Joystick.AxisType.kTwist);
     	
+    	
+    	boolean u = launchStick.getRawAxis(3) > .5;
+    	
+    	
+    	if (u){
+    		mainLauncher.launch();
+    	}
     	mainDrive.drive(x, y, r);
     	
     }

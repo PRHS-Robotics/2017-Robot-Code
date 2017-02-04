@@ -59,10 +59,10 @@ public class DriveTrain {
 		flpower += (y/(1 + abs(x) + abs(r)));
 		flpower += (r/(1 + abs(x) + abs(y)));
 		
-		SmartDashboard.getDouble("FLK", 1);
-		SmartDashboard.getDouble("FRK", 1);
-		SmartDashboard.getDouble("BLK", 1);
-		SmartDashboard.getDouble("BRK", 1);
+		FLK = SmartDashboard.getDouble("FLK", 1);
+		FRK = SmartDashboard.getDouble("FRK", 1);
+		BLK = SmartDashboard.getDouble("BLK", 1);
+		BRK = SmartDashboard.getDouble("BRK", 1);
 		
 		SmartDashboard.putNumber("Front Left", flpower * FLK);
 		SmartDashboard.putNumber("Front Right", frpower * FRK);
