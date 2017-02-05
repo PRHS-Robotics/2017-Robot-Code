@@ -7,26 +7,29 @@ public class Launcher {
 
 	Talon motor = new Talon(1);
 	
-	double la = 1;
+	double launchPower = 1;
 	
-	public Launcher(){
+	public Launcher() {
 	
 		motor.setInverted(true);
 		
-		SmartDashboard.putNumber("La", la);
+		SmartDashboard.putNumber("Launch Power", launchPower);
 		
 	}
 	
 	
 	
-	public void launch (){
+	public void start() {
 		
-		la = SmartDashboard.getDouble("la", 1);
+		launchPower = SmartDashboard.getNumber("Launch Power", 1);
 		
-		SmartDashboard.putNumber("LaunchPower", la);
 
-		motor.set(la);
+		motor.set(launchPower);
 		
+	}
+	
+	public void stop() {
+		motor.set(0);
 	}
 	
 	

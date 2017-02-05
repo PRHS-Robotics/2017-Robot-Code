@@ -6,7 +6,6 @@ import org.usfirst.frc.team4068.robot.subsystems.Launcher;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -24,8 +23,6 @@ public class Robot extends IterativeRobot {
 	
 	Launcher mainLauncher = new Launcher();
 	DriveTrain mainDrive = new DriveTrain(); 
-	
-	int uio = 0;
 	
     final String defaultAuto = "Default";
     final String customAuto = "My Auto";
@@ -99,14 +96,17 @@ public class Robot extends IterativeRobot {
     	double y = driveStick.getAxis(Joystick.AxisType.kY);
     	double r = driveStick.getAxis(Joystick.AxisType.kTwist);
     	
-    	
-    	boolean u = launchStick.getRawAxis(3) > .5;
-    	
-    	
-    	if (u){
-    		mainLauncher.launch();
-    	}
     	mainDrive.drive(x, y, r);
+    	
+    	//Checks if the xbox right trigger has been pressed
+    	boolean triggerPressed = launchStick.getRawAxis(3) > .5;
+    	
+    	if (triggerPressed){
+    		mainLauncher.start();
+    	} else {
+    		mainLauncher.stop();
+    	}
+    	
     	
     }
     
