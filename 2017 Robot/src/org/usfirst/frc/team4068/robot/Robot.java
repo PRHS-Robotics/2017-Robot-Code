@@ -3,6 +3,7 @@ package org.usfirst.frc.team4068.robot;
 
 import org.usfirst.frc.team4068.robot.subsystems.DriveTrain;
 import org.usfirst.frc.team4068.robot.subsystems.Launcher;
+import org.usfirst.frc.team4068.robot.subsystems.Sonar;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
@@ -22,7 +23,9 @@ public class Robot extends IterativeRobot {
 	Joystick launchStick = new Joystick(2);
 	
 	Launcher mainLauncher = new Launcher();
-	DriveTrain mainDrive = new DriveTrain(); 
+	DriveTrain mainDrive = new DriveTrain();
+	
+	//Sonar ultra = new Sonar(6, 7);
 	
     final String defaultAuto = "Default";
     final String customAuto = "My Auto";
@@ -34,6 +37,7 @@ public class Robot extends IterativeRobot {
      * used for any initialization code.
      */
     public void robotInit() {
+    	//ultra.setAutomaticMode(true);
         chooser = new SendableChooser();
         chooser.addDefault("Default Auto", defaultAuto);
         chooser.addObject("My Auto", customAuto);
@@ -81,6 +85,7 @@ public class Robot extends IterativeRobot {
     			mainDrive.drive(.1, 0, 0);
     		}
     	}
+    	mainDrive.drive(0, 0, 0);
     	t1.stop();
 
         }
