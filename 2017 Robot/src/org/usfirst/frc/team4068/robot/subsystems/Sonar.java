@@ -9,12 +9,12 @@ public class Sonar {
 	/** puts gets distance from sonar thing and puts it on
 	 *  SmartDashboard and returns it as a double
 	 */
-	public double getInches() {
+	public double getDistancemm() {
 		double voltage = sonar.getVoltage();
-		double sensitivity = 1/5120;
-		SmartDashboard.putNumber("Sensitivity", sensitivity);
-		sensitivity = SmartDashboard.getNumber("Sensitivity", 1);
+		double sensitivity = 5/5120;
+		
 		double mm = sensitivity * voltage;
+		SmartDashboard.putNumber("distance mm", mm);
 		return mm;
 		
 	}
