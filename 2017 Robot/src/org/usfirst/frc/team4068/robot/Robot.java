@@ -25,7 +25,7 @@ public class Robot extends IterativeRobot {
 	Launcher mainLauncher = new Launcher();
 	DriveTrain mainDrive = new DriveTrain();
 	
-	Sonar ultra = new Sonar(6, 7);
+	//Sonar ultra = new Sonar(6, 7);
 	
     final String defaultAuto = "Default";
     final String customAuto = "My Auto";
