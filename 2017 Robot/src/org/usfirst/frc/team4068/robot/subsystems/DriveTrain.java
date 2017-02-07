@@ -43,13 +43,21 @@ public class DriveTrain {
 	public void drive(double x, double y, double r){
 		double frpower, brpower, blpower, flpower;
 		
-		frpower = -y - x + r;
+		frpower = ((-x)/(1 + Math.abs(y) + Math.abs(r)));
+		frpower += ((-y)/(1 + Math.abs(x) + Math.abs(r)));
+		frpower += ((r)/(1 + Math.abs(x) + Math.abs(y)));
 		
-		brpower = -y + x + r;
+		brpower = ((x)/(1 + Math.abs(y) + Math.abs(r)));
+		brpower += ((-y)/(1 + Math.abs(x) + Math.abs(r)));
+		frpower += ((r)/(1 + Math.abs(x) + Math.abs(y)));
 		
-		blpower = y + x + r;
+		blpower = ((x)/(1 + Math.abs(y) + Math.abs(r)));
+		blpower += ((y)/(1 + Math.abs(x) + Math.abs(r)));
+		frpower += ((r)/(1 + Math.abs(x) + Math.abs(y)));
 		
-		flpower = y - x + r;
+		flpower = ((-x)/(1 + Math.abs(y) + Math.abs(r)));
+		flpower += ((y)/(1 + Math.abs(y) + Math.abs(r)));
+		frpower += ((r)/(1 + Math.abs(x) + Math.abs(y)));
 		
 		FLK = SmartDashboard.getNumber("FLK", 1);
 		FRK = SmartDashboard.getNumber("FRK", 1);
