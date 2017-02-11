@@ -1,7 +1,9 @@
 
 package org.usfirst.frc.team4068.robot;
 
+import org.opencv.core.MatOfKeyPoint;
 import org.usfirst.frc.team4068.robot.subsystems.DriveTrain;
+import org.usfirst.frc.team4068.robot.subsystems.GripPipeline;
 import org.usfirst.frc.team4068.robot.subsystems.Launcher;
 import org.usfirst.frc.team4068.robot.subsystems.Sonar;
 
@@ -24,6 +26,9 @@ public class Robot extends IterativeRobot {
 	
 	Launcher mainLauncher = new Launcher();
 	DriveTrain mainDrive = new DriveTrain();
+	
+	GripPipeline pipeline = new GripPipeline();
+	
 	
 	//Sonar ultra = new Sonar(6, 7);
 	
@@ -112,6 +117,12 @@ public class Robot extends IterativeRobot {
     		mainLauncher.stop();
     	}
     	
+    	MatOfKeyPoint b = new MatOfKeyPoint();
+    	b = pipeline.findBlobsOutput();
+    	String z = b.toString();
+    	
+    	SmartDashboard.putString("imagestring", z);
+    	
     	
     }
     
@@ -120,6 +131,19 @@ public class Robot extends IterativeRobot {
      */
     public void testPeriodic() {
     
+    }
+    
+    public void x() {
+    	MatOfKeyPoint y = new MatOfKeyPoint();
+    	y = pipeline.findBlobsOutput();
+    	String z = y.toString();
+    	
+    	SmartDashboard.putString("imagestring", z);
+    }
+    
+    public static void main(String[] args) {
+    	Robot a = new Robot();
+    	a.x();
     }
     
 }
