@@ -3,15 +3,28 @@ package org.usfirst.frc.team4068.robot;
 
 import org.opencv.core.MatOfKeyPoint;
 import org.usfirst.frc.team4068.robot.subsystems.DriveTrain;
-import org.usfirst.frc.team4068.robot.subsystems.GripPipeline;
+import org.usfirst.frc.team4068.robot.subsystems.Pipeline;
 import org.usfirst.frc.team4068.robot.subsystems.Launcher;
 import org.usfirst.frc.team4068.robot.subsystems.Sonar;
 
+import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import org.opencv.imgproc.Imgproc;
+import edu.wpi.cscore.UsbCamera;
+import edu.wpi.first.wpilibj.vision.VisionPipeline;
+import edu.wpi.first.wpilibj.vision.VisionRunner;
+import edu.wpi.first.wpilibj.vision.VisionThread;
+import edu.wpi.first.wpilibj.networktables.NetworkTable;
+import org.opencv.core.Rect;
+import edu.wpi.first.wpilibj.RobotDrive;
+
+import edu.wpi.first.wpilibj.IterativeRobot;
+
+
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -20,15 +33,25 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * creating this project, you must also update the manifest file in the resource
  * directory.
  */
+
 public class Robot extends IterativeRobot {
+	private static final int IMG_WIDTH = 320;
+	private static final int IMG_HEIGHT = 240;
+	
+	private VisionThread visionThread;
+	private double centerX = 0.0;
+	private RobotDrive drive;
+	
+	private final Object imgLock = new Object();
+	
 	Joystick driveStick = new Joystick(1);
 	Joystick launchStick = new Joystick(2);
 	
 	Launcher mainLauncher = new Launcher();
 	DriveTrain mainDrive = new DriveTrain();
 	
-	GripPipeline pipeline = new GripPipeline();
-	
+	Pipeline pipeline = new Pipeline();
+
 	
 	//Sonar ultra = new Sonar(6, 7);
 	
@@ -36,12 +59,23 @@ public class Robot extends IterativeRobot {
     final String customAuto = "My Auto";
     String autoSelected;
     SendableChooser chooser;
-	
+ 
     /**
      * This function is run when the robot is first started up and should be
      * used for any initialization code.
      */
     public void robotInit() {
+    	UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
+    	camera.setResolution(640, 480);
+    	visionThread = new VisionThread(camera, new Pipeline(), pipeline -> {
+            if (!pipeline.filterContoursOutput().isEmpty()) {
+                Rect r = Imgproc.boundingRect(pipeline.filterContoursOutput().get(0));
+                synchronized (imgLock) {
+                    centerX = r.x + (r.width / 2);
+                }
+            }
+        });
+    	visionThread.start();
     	//ultra.setAutomaticMode(true);
         chooser = new SendableChooser();
         chooser.addDefault("Default Auto", defaultAuto);
@@ -118,7 +152,7 @@ public class Robot extends IterativeRobot {
     	}
     	
     	MatOfKeyPoint b = new MatOfKeyPoint();
-    	b = pipeline.findBlobsOutput();
+    	//b = pipeline.findBlobsOutput();
     	String z = b.toString();
     	
     	SmartDashboard.putString("imagestring", z);
@@ -133,17 +167,5 @@ public class Robot extends IterativeRobot {
     
     }
     
-    public void x() {
-    	MatOfKeyPoint y = new MatOfKeyPoint();
-    	y = pipeline.findBlobsOutput();
-    	String z = y.toString();
-    	
-    	SmartDashboard.putString("imagestring", z);
-    }
-    
-    public static void main(String[] args) {
-    	Robot a = new Robot();
-    	a.x();
-    }
     
 }
