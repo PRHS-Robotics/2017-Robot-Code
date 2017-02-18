@@ -55,7 +55,7 @@ public class Robot extends IterativeRobot {
 	Pipeline pipeline = new Pipeline();
 	
 	
-	//Sonar ultra = new Sonar(6, 7);
+	Sonar sonar = new Sonar();
 	
     final String defaultAuto = "Default";
     final String customAuto = "My Auto";
@@ -80,6 +80,9 @@ public class Robot extends IterativeRobot {
 	            }
     		}
         });
+    	
+    	
+    	
     	visionThread.start();
     	//ultra.setAutomaticMode(true);
         chooser = new SendableChooser();
@@ -149,6 +152,7 @@ public class Robot extends IterativeRobot {
     	
     	//Checks if the xbox right trigger has been pressed
     	boolean triggerPressed = launchStick.getRawAxis(3) > .5;
+    	boolean aButtonPressed = launchStick.getRawButton(1);
     	
     	if (triggerPressed){
     		mainLauncher.start();
@@ -156,15 +160,23 @@ public class Robot extends IterativeRobot {
     		mainLauncher.stop();
     	}
     	
-    	
-    	
-    	
-    	MatOfKeyPoint b = new MatOfKeyPoint();
-    	//b = pipeline.findBlobsOutput();
-    	String z = b.toString();
-    	
-    	SmartDashboard.putString("imagestring", z);
-    	
+    	if (aButtonPressed) {
+    		if (centerX < 305 ) {
+    			mainDrive.drive(0, 0, .5);
+    		} else if (centerX > 335){
+    			mainDrive.drive(0, 0, -.5);
+    		} else {
+    			if (sonar.getDistancemm() < 2743.2) {
+    				mainDrive.drive(0, -.5, 0);
+    			} else if (sonar.getDistancemm() > 3352.8) {
+    				mainDrive.drive(0, .5, 0);
+    			}
+    		}
+    		
+    		mainDrive.drive(0, 0, 0);
+    			
+    	}
+  	
     	
     }
     
