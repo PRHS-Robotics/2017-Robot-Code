@@ -2,6 +2,7 @@
 package org.usfirst.frc.team4068.robot;
 
 import org.opencv.core.MatOfKeyPoint;
+import org.usfirst.frc.team4068.robot.subsystems.BallCollector;
 import org.usfirst.frc.team4068.robot.subsystems.DriveTrain;
 import org.usfirst.frc.team4068.robot.subsystems.Pipeline;
 import org.usfirst.frc.team4068.robot.subsystems.Launcher;
@@ -51,6 +52,7 @@ public class Robot extends IterativeRobot {
 	
 	Launcher mainLauncher = new Launcher();
 	DriveTrain mainDrive = new DriveTrain();
+	BallCollector collector = new BallCollector();
 	
 	Pipeline pipeline = new Pipeline();
 	
@@ -153,11 +155,18 @@ public class Robot extends IterativeRobot {
     	//Checks if the xbox right trigger has been pressed
     	boolean triggerPressed = launchStick.getRawAxis(3) > .5;
     	boolean aButtonPressed = launchStick.getRawButton(1);
+    	boolean leftTriggerPressed = launchStick.getRawAxis(2) > .5;
     	
     	if (triggerPressed){
     		mainLauncher.start();
     	} else {
     		mainLauncher.stop();
+    	}
+    	
+    	if (leftTriggerPressed) {
+    		collector.spin();
+    	} else {
+    		collector.stop();
     	}
     	
     	if (aButtonPressed) {
@@ -176,6 +185,8 @@ public class Robot extends IterativeRobot {
     		mainDrive.drive(0, 0, 0);
     			
     	}
+    	
+    	
   	
     	
     }
