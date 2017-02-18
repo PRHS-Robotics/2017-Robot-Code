@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Launcher {
 
-	Talon motor = new Talon(2);
+	Talon motor = new Talon(1);
 	
 	double launchPower = 1;
 	

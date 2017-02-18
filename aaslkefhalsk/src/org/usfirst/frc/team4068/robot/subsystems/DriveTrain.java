@@ -10,10 +10,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class DriveTrain {
 
-	Talon frontRight = new Talon(5);
-	Talon backRight = new Talon(1);
+	Talon frontRight = new Talon(1);
+	Talon backRight = new Talon(5);
 	Talon backLeft = new Talon(4);
-	Talon frontLeft = new Talon(3);
+	Talon frontLeft = new Talon(2);
 	
 	double FLK = 1;
 	double FRK = 1;
@@ -23,10 +23,10 @@ public class DriveTrain {
 	
 	
 	public DriveTrain(){
-		frontRight.setInverted(false);
+		frontRight.setInverted(true);
 		backRight.setInverted(true);
-		backLeft.setInverted(false);
-		frontLeft.setInverted(false);
+		backLeft.setInverted(true);
+		frontLeft.setInverted(true);
 		
 		SmartDashboard.putNumber("FLK", FLK);
 		SmartDashboard.putNumber("FRK", FRK);
