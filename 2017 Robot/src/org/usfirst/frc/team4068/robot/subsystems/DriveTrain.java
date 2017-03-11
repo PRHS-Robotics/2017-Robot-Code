@@ -10,10 +10,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class DriveTrain {
 
-	Talon frontRight = new Talon(5);
-	Talon backRight = new Talon(1);
+	Talon frontRight = new Talon(1);
+	Talon backRight = new Talon(5);
 	Talon backLeft = new Talon(4);
-	Talon frontLeft = new Talon(3);
+	Talon frontLeft = new Talon(2);
 	
 	double FLK = 1;
 	double FRK = 1;
@@ -23,9 +23,9 @@ public class DriveTrain {
 	
 	
 	public DriveTrain(){
-		frontRight.setInverted(false);
+		frontRight.setInverted(true);
 		backRight.setInverted(true);
-		backLeft.setInverted(false);
+		backLeft.setInverted(true);
 		frontLeft.setInverted(false);
 		
 		SmartDashboard.putNumber("FLK", FLK);
@@ -43,10 +43,21 @@ public class DriveTrain {
 	public void drive(double x, double y, double r){
 		double frpower, brpower, blpower, flpower;
 		
-		flpower = (y -r +x);
-        frpower = (-y -r +x);
-        blpower = (y +r +x);
-        brpower = (-y +r +x);
+		double sum = (Math.abs(x) + Math.abs(y) + Math.abs(r));
+		
+		if(sum != 0){
+			flpower = ( y - x + r) / sum;
+			frpower = (-y - x + r) / sum;
+			blpower = ( y + x + r) / sum;
+			brpower = (-y + x + r) / sum;
+		} else {
+			flpower = frpower = blpower = brpower = 0;
+		}
+		
+		/*flpower = (y -x +r);
+        frpower = (-y -x +r);
+        blpower = (y +x +r);
+        brpower = (-y +x +r);*/
 		
 		FLK = SmartDashboard.getNumber("FLK", 1);
 		FRK = SmartDashboard.getNumber("FRK", 1);
