@@ -1,0 +1,35 @@
+diff a/2017 Robot/src/org/usfirst/frc/team4068/robot/subsystems/DriveTrain.java b/2017 Robot/src/org/usfirst/frc/team4068/robot/subsystems/DriveTrain.java	(rejected hunks)
+@@ -43,21 +43,21 @@
+ 	public void drive(double x, double y, double r){
+ 		double frpower, brpower, blpower, flpower;
+ 		
+-		frpower = ((-x)/(1 + Math.abs(y) + Math.abs(r)));
+-		frpower += ((-y)/(1 + Math.abs(x) + Math.abs(r)));
+-		frpower += ((r)/(1 + Math.abs(x) + Math.abs(y)));
++		frpower = ((-r)/(1 + Math.abs(y) + Math.abs(x)));
++		frpower += ((-y)/(1 + Math.abs(r) + Math.abs(x)));
++		frpower += ((x)/(1 + Math.abs(r) + Math.abs(y)));
+ 		
+-		brpower = ((x)/(1 + Math.abs(y) + Math.abs(r)));
+-		brpower += ((-y)/(1 + Math.abs(x) + Math.abs(r)));
+-		frpower += ((r)/(1 + Math.abs(x) + Math.abs(y)));
++		brpower = ((r)/(1 + Math.abs(y) + Math.abs(x)));
++		brpower += ((-y)/(1 + Math.abs(r) + Math.abs(x)));
++		frpower += ((x)/(1 + Math.abs(r) + Math.abs(y)));
+ 		
+-		blpower = ((x)/(1 + Math.abs(y) + Math.abs(r)));
+-		blpower += ((y)/(1 + Math.abs(x) + Math.abs(r)));
+-		frpower += ((r)/(1 + Math.abs(x) + Math.abs(y)));
++		blpower = ((r)/(1 + Math.abs(y) + Math.abs(x)));
++		blpower += ((y)/(1 + Math.abs(r) + Math.abs(x)));
++		frpower += ((x)/(1 + Math.abs(r) + Math.abs(y)));
+ 		
+-		flpower = ((-x)/(1 + Math.abs(y) + Math.abs(r)));
+-		flpower += ((y)/(1 + Math.abs(y) + Math.abs(r)));
+-		frpower += ((r)/(1 + Math.abs(x) + Math.abs(y)));
++		flpower = ((-r)/(1 + Math.abs(y) + Math.abs(x)));
++		flpower += ((y)/(1 + Math.abs(y) + Math.abs(x)));
++		frpower += ((x)/(1 + Math.abs(r) + Math.abs(y)));
+ 		
+ 		FLK = SmartDashboard.getNumber("FLK", 1);
+ 		FRK = SmartDashboard.getNumber("FRK", 1);

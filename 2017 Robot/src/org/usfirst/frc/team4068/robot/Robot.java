@@ -137,7 +137,7 @@ public class Robot extends IterativeRobot {
     	climber1.set(launchStick.getRawAxis(4));
     	climber2.set(launchStick.getRawAxis(4));
     	
-    	double exp = 2.0;
+    	double exp = 1.0;
     	
     	double x = -driveStick.getAxis(Joystick.AxisType.kX);
     	double y = -driveStick.getAxis(Joystick.AxisType.kY);
