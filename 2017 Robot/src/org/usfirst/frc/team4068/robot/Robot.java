@@ -103,27 +103,48 @@ public class Robot extends IterativeRobot {
 	 * If using the SendableChooser make sure to add them to the chooser code above as well.
 	 */
     public void autonomousInit() {
+    	Timer time = new Timer();
+    	time.start();
     	autoSelected = (String) chooser.getSelected();
 //		autoSelected = SmartDashboard.getString("Auto Selector", defaultAuto);
 		System.out.println("Auto selected: " + autoSelected);
 		
-		mainDrive.drive(0, .5, 0);
-    	try{Thread.sleep(1000);}catch(Exception e){}
+		while (time.get() < 2) {
+			mainDrive.drive(0, .8, 0);
+		}
+		while (time.get() < 3.2) {
+			mainDrive.drive(-.8, 0, 0);
+		}
+		try {
+			Thread.sleep(3000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		while (time.get() < 8) {
+			mainDrive.drive(.8, 0, 0);
+		}
+		while (time.get() < 9) {
+			mainDrive.drive(0,  .8, 0);
+		}
+		time.stop();
+		
     }
 
     /**
      * This function is called periodically during autonomous
      */
     public void autonomousPeriodic() {
-    	/*switch(autoSelected) {
+    	switch(autoSelected) {
     	case customAuto:
-        //Put custom auto code here   
+        //Put custom auto code here
+    		
             break;
     	case defaultAuto:
     	default:
     	//Put default auto code here
             break;
-    	}*/
+    	}
     }
     
     Talon climber1 = new Talon(11);
