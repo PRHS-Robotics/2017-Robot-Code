@@ -5,13 +5,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Launcher {
 
-	Talon motor = new Talon(2);
+	Talon motor = new Talon(3);
 	
 	double launchPower = 1;
 	
 	public Launcher() {
 	
-		motor.setInverted(true);
+		motor.setInverted(false);
 		
 		SmartDashboard.putNumber("Launch Power", launchPower);
 		

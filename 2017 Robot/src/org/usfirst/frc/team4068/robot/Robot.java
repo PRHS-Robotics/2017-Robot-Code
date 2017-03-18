@@ -22,7 +22,7 @@ import edu.wpi.first.wpilibj.vision.VisionThread;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import org.opencv.core.Rect;
 import edu.wpi.first.wpilibj.RobotDrive;
-
+import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.IterativeRobot;
 
 
@@ -103,54 +103,87 @@ public class Robot extends IterativeRobot {
 	 * If using the SendableChooser make sure to add them to the chooser code above as well.
 	 */
     public void autonomousInit() {
+    	Timer time = new Timer();
+    	time.start();
     	autoSelected = (String) chooser.getSelected();
 //		autoSelected = SmartDashboard.getString("Auto Selector", defaultAuto);
 		System.out.println("Auto selected: " + autoSelected);
+		
+		while (time.get() < .7) {
+			mainDrive.drive(0, .6, 0);
+		}
+		/*
+		while (time.get() < 2) {
+			mainDrive.drive(-.5, 0, 0);
+		}
+		try {
+			Thread.sleep(3000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		while (time.get() < 8) {
+			mainDrive.drive(.8, 0, 0);
+		}
+		while (time.get() < 9) {
+			mainDrive.drive(0,  .8, 0);
+		}
+		time.stop();
+		*/
     }
 
     /**
      * This function is called periodically during autonomous
      */
     public void autonomousPeriodic() {
-    	/*switch(autoSelected) {
+    	switch(autoSelected) {
     	case customAuto:
-        //Put custom auto code here   
+        //Put custom auto code here
+    		
             break;
     	case defaultAuto:
     	default:
     	//Put default auto code here
             break;
-    	}*/
-    	Timer t1 = new Timer();
-    	t1.start();
-    	while (t1.get() <= 15000000) {
-    		while (t1.get() <= 6000000) {
-    			mainDrive.drive(.1, 0, 0);
-    		}
-    		while (t1.get() > 6000000 && t1.get() <= 8000000) {
-    			mainDrive.drive(0, 0, .7);
-    		}
-    		while (t1.get() > 8000000) {
-    			mainDrive.drive(.1, 0, 0);
-    		}
     	}
-    	mainDrive.drive(0, 0, 0);
-    	t1.stop();
-
-        }
-
+    }
+    
+    Talon climber1 = new Talon(11);
+    Talon climber2 = new Talon(12);
+    
     /**
      * This function is called periodically during operator control
      */
     public void teleopPeriodic() {
     	
+    	climber1.set(launchStick.getRawAxis(4));
+    	climber2.set(launchStick.getRawAxis(4));
     	
+    	double exp = 1.0;
     	
-    	double x = driveStick.getAxis(Joystick.AxisType.kX);
-    	double y = driveStick.getAxis(Joystick.AxisType.kY);
+    	double x = -driveStick.getAxis(Joystick.AxisType.kX);
+    	double y = -driveStick.getAxis(Joystick.AxisType.kY);
     	double r = driveStick.getAxis(Joystick.AxisType.kTwist);
     	
-    	mainDrive.drive(x, y, r);
+    	
+    	x = Math.signum(x) * Math.pow(Math.abs(x), exp);
+    	y = Math.signum(y) * Math.pow(Math.abs(y), exp);
+    	r = Math.signum(r) * Math.pow(Math.abs(r), exp);
+    	
+    	
+    	mainDrive.drive((Math.abs(x)>.2)?x:0, (Math.abs(y)>.2)?y:0, (Math.abs(r)>.1)?r:0);
+    	
+    	//mainDrive.drive(.15, 0, 0);
+    	
+    	/*
+    	if (driveStick.getRawButton(1)){
+    		mainDrive.drive(1, y, r);
+    	}else if (driveStick.getRawButton(2)){
+    		mainDrive.drive(-1, y, r);
+    	}else{
+    		mainDrive.drive(0, 0, 0);
+    	}
+    	*/
     	
     	//Checks if the xbox right trigger has been pressed
     	boolean triggerPressed = launchStick.getRawAxis(3) > .5;
@@ -164,7 +197,7 @@ public class Robot extends IterativeRobot {
     	}
     	
     	if (leftTriggerPressed) {
-    		collector.spin();
+    		collector.spin(launchStick.getRawAxis(4));
     	} else {
     		collector.stop();
     	}
