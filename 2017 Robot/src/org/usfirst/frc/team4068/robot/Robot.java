@@ -109,11 +109,12 @@ public class Robot extends IterativeRobot {
 //		autoSelected = SmartDashboard.getString("Auto Selector", defaultAuto);
 		System.out.println("Auto selected: " + autoSelected);
 		
-		while (time.get() < 2) {
-			mainDrive.drive(0, .8, 0);
+		while (time.get() < .7) {
+			mainDrive.drive(0, .6, 0);
 		}
-		while (time.get() < 3.2) {
-			mainDrive.drive(-.8, 0, 0);
+		/*
+		while (time.get() < 2) {
+			mainDrive.drive(-.5, 0, 0);
 		}
 		try {
 			Thread.sleep(3000);
@@ -128,7 +129,7 @@ public class Robot extends IterativeRobot {
 			mainDrive.drive(0,  .8, 0);
 		}
 		time.stop();
-		
+		*/
     }
 
     /**
