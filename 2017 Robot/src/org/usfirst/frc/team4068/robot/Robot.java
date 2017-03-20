@@ -64,11 +64,17 @@ public class Robot extends IterativeRobot {
     String autoSelected;
     SendableChooser chooser;
  
+    Talon climber1 = new Talon(11);
+    Talon climber2 = new Talon(12);
+    Talon ballSpinner = new Talon(6);
+    
     /**
      * This function is run when the robot is first started up and should be
      * used for any initialization code.
      */
     public void robotInit() {
+    	climber1.setInverted(false);
+    	climber2.setInverted(false);
     	UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
     	camera.setResolution(640, 480);
     	visionThread = new VisionThread(camera, new Pipeline(), new VisionRunner.Listener<Pipeline>() {
@@ -112,6 +118,7 @@ public class Robot extends IterativeRobot {
 		while (time.get() < .7) {
 			mainDrive.drive(0, .6, 0);
 		}
+		mainDrive.drive(0, 0, 0);
 		/*
 		while (time.get() < 2) {
 			mainDrive.drive(-.5, 0, 0);
@@ -148,60 +155,63 @@ public class Robot extends IterativeRobot {
     	}
     }
     
-    Talon climber1 = new Talon(11);
-    Talon climber2 = new Talon(12);
-    
     /**
      * This function is called periodically during operator control
      */
     public void teleopPeriodic() {
+    	//Rope Climber
+    	double climberSpeed = (-driveStick.getRawAxis(3) + 1) / 2; //convert the range from [-1, 1] to [0, 1]
+    	climber1.set(climberSpeed);
+    	climber2.set(climberSpeed);
     	
-    	climber1.set(launchStick.getRawAxis(4));
-    	climber2.set(launchStick.getRawAxis(4));
     	
+    	//Drive Train
     	double exp = 1.0;
     	
     	double x = -driveStick.getAxis(Joystick.AxisType.kX);
     	double y = -driveStick.getAxis(Joystick.AxisType.kY);
     	double r = driveStick.getAxis(Joystick.AxisType.kTwist);
     	
-    	
-    	x = Math.signum(x) * Math.pow(Math.abs(x), exp);
-    	y = Math.signum(y) * Math.pow(Math.abs(y), exp);
-    	r = Math.signum(r) * Math.pow(Math.abs(r), exp);
-    	
+    	if (driveStick.getRawButton(2)){ //button 2 switches drive controls for the left side to act as the front
+	    	double x_tmp = Math.signum(x) * Math.pow(Math.abs(x), exp);
+	    	double y_tmp = Math.signum(y) * Math.pow(Math.abs(y), exp);
+	    	double r_tmp = Math.signum(r) * Math.pow(Math.abs(r), exp);
+	    	x = y_tmp;
+	    	y = x_tmp;
+	    	r = r_tmp;
+    	}else{
+    		x = Math.signum(x) * Math.pow(Math.abs(x), exp);
+	    	y = Math.signum(y) * Math.pow(Math.abs(y), exp);
+	    	r = Math.signum(r) * Math.pow(Math.abs(r), exp);
+    	}
     	
     	mainDrive.drive((Math.abs(x)>.2)?x:0, (Math.abs(y)>.2)?y:0, (Math.abs(r)>.1)?r:0);
     	
-    	//mainDrive.drive(.15, 0, 0);
-    	
-    	/*
-    	if (driveStick.getRawButton(1)){
-    		mainDrive.drive(1, y, r);
-    	}else if (driveStick.getRawButton(2)){
-    		mainDrive.drive(-1, y, r);
-    	}else{
-    		mainDrive.drive(0, 0, 0);
-    	}
-    	*/
-    	
+    	//Launcher
     	//Checks if the xbox right trigger has been pressed
-    	boolean triggerPressed = launchStick.getRawAxis(3) > .5;
-    	boolean aButtonPressed = launchStick.getRawButton(1);
-    	boolean leftTriggerPressed = launchStick.getRawAxis(2) > .5;
-    	
-    	if (triggerPressed){
+    	boolean rightTriggerPressed = launchStick.getRawAxis(3) > .5;
+    	if (rightTriggerPressed){
     		mainLauncher.start();
     	} else {
     		mainLauncher.stop();
     	}
     	
+    	
+    	//Ball Collector
+    	boolean leftTriggerPressed = launchStick.getRawAxis(2) > .5;
     	if (leftTriggerPressed) {
-    		collector.spin(launchStick.getRawAxis(4));
+    		collector.spin(1);
     	} else {
     		collector.stop();
     	}
     	
+    	
+    	//Basket Spinner
+    	ballSpinner.set(launchStick.getRawAxis(0));
+    	
+    	
+    	//Vision Auto-aim
+    	boolean aButtonPressed = launchStick.getRawButton(1);
     	if (aButtonPressed) {
     		if (centerX < 305 ) {
     			mainDrive.drive(0, 0, .5);
@@ -218,9 +228,6 @@ public class Robot extends IterativeRobot {
     		mainDrive.drive(0, 0, 0);
     			
     	}
-    	
-    	
-  	
     	
     }
     
