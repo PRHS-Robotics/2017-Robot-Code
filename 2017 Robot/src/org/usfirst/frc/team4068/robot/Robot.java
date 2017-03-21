@@ -1,6 +1,17 @@
 
 package org.usfirst.frc.team4068.robot;
 
+import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.nio.ByteBuffer;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import org.opencv.core.MatOfKeyPoint;
 import org.usfirst.frc.team4068.robot.subsystems.BallCollector;
 import org.usfirst.frc.team4068.robot.subsystems.DriveTrain;
@@ -61,6 +72,8 @@ public class Robot extends IterativeRobot {
 	
     final String defaultAuto = "Default";
     final String customAuto = "My Auto";
+    static double currentVoltage = 12;
+    static Object voltage_rw_Lock = new Object();
     String autoSelected;
     SendableChooser chooser;
  
@@ -68,11 +81,28 @@ public class Robot extends IterativeRobot {
     Talon climber2 = new Talon(12);
     Talon ballSpinner = new Talon(6);
     
+    ByteArrayOutputStream autoStreamRecorder;
+    boolean autoProgramWritten;
     /**
      * This function is run when the robot is first started up and should be
      * used for any initialization code.
      */
     public void robotInit() {
+    	SmartDashboard.putBoolean("Load Auto From File", false);
+    	
+    	/*
+    	new Thread(){
+    		public void run(){
+    			while (Robot.this.isAutonomous()&&Robot.this.isEnabled()){
+    				double readVoltage = Robot.this.m_ds.getBatteryVoltage();
+    				synchronized(voltage_rw_Lock){
+    					currentVoltage = readVoltage;
+    				}
+    			}
+    		}
+    	}.start();
+    	*/
+    	
     	climber1.setInverted(false);
     	climber2.setInverted(false);
     	UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
@@ -89,7 +119,7 @@ public class Robot extends IterativeRobot {
     		}
         });
     	
-    	
+    	autoStreamRecorder = new ByteArrayOutputStream();
     	
     	visionThread.start();
     	//ultra.setAutomaticMode(true);
@@ -97,6 +127,12 @@ public class Robot extends IterativeRobot {
         chooser.addDefault("Default Auto", defaultAuto);
         chooser.addObject("My Auto", customAuto);
         SmartDashboard.putData("Auto choices", chooser);
+    }
+    
+    public static double getCurrentVoltage(){
+    	synchronized(voltage_rw_Lock){
+    		return currentVoltage;
+    	}
     }
     
 	/**
@@ -109,6 +145,39 @@ public class Robot extends IterativeRobot {
 	 * If using the SendableChooser make sure to add them to the chooser code above as well.
 	 */
     public void autonomousInit() {
+    	
+    	boolean fileAuto = SmartDashboard.getBoolean("Load Auto From File");
+    	
+    	try {
+    		ByteArrayInputStream autoStreamPlayback;
+    		if (fileAuto){
+    			Path path = Paths.get("/home/lvuser/Auto.auto");
+    			byte[] data = Files.readAllBytes(path);
+    			autoStreamPlayback = new ByteArrayInputStream(data);
+        	}else{
+        		autoStreamPlayback = new ByteArrayInputStream(autoStreamRecorder.toByteArray());
+        	}
+	    	
+	    	byte[] doubleBuffer = new byte[8];
+	    	while (autoStreamPlayback.available() >= 24){
+	    		autoStreamPlayback.read(doubleBuffer);
+	    		double x = ByteBuffer.wrap(doubleBuffer).getDouble();
+	    		autoStreamPlayback.read(doubleBuffer);
+	    		double y = ByteBuffer.wrap(doubleBuffer).getDouble();
+	    		autoStreamPlayback.read(doubleBuffer);
+	    		double r = ByteBuffer.wrap(doubleBuffer).getDouble();
+	    		
+	    		mainDrive.drive((Math.abs(x)>.2)?x:0, (Math.abs(y)>.2)?y:0, (Math.abs(r)>.1)?r:0);
+	    		
+	    		Thread.sleep(20);
+	    	}
+    	}catch (Exception e){
+    		e.printStackTrace();
+    	}
+    	
+    	mainDrive.drive(0, 0, 0);
+    	
+    	/*
     	Timer time = new Timer();
     	time.start();
     	autoSelected = (String) chooser.getSelected();
@@ -153,6 +222,8 @@ public class Robot extends IterativeRobot {
     	//Put default auto code here
             break;
     	}
+    	
+    	
     }
     
     /**
@@ -184,6 +255,28 @@ public class Robot extends IterativeRobot {
 	    	y = Math.signum(y) * Math.pow(Math.abs(y), exp);
 	    	r = Math.signum(r) * Math.pow(Math.abs(r), exp);
     	}
+    	
+
+    	try {
+	    	if (launchStick.getRawButton(3)){
+	    		byte[] bytes = new byte[8];
+	    	    ByteBuffer.wrap(bytes).putDouble(x);
+	    		this.autoStreamRecorder.write(bytes);
+	    		ByteBuffer.wrap(bytes).putDouble(y);
+	    		this.autoStreamRecorder.write(bytes);
+	    		ByteBuffer.wrap(bytes).putDouble(r);
+	    		this.autoStreamRecorder.write(bytes);
+	    	}
+	    	
+	    	if (launchStick.getRawButton(4)){
+	    		FileOutputStream fos = new FileOutputStream("/home/lvuser/Auto.auto");
+	    		fos.write(autoStreamRecorder.toByteArray());
+	    		fos.close();
+	    	}
+    	}catch (Exception e){
+    		e.printStackTrace();
+    	}
+    	
     	
     	mainDrive.drive((Math.abs(x)>.2)?x:0, (Math.abs(y)>.2)?y:0, (Math.abs(r)>.1)?r:0);
     	
