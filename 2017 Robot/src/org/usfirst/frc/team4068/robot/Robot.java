@@ -1,18 +1,14 @@
 
 package org.usfirst.frc.team4068.robot;
 
-import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import org.opencv.core.MatOfKeyPoint;
 import org.usfirst.frc.team4068.robot.subsystems.BallCollector;
 import org.usfirst.frc.team4068.robot.subsystems.DriveTrain;
 import org.usfirst.frc.team4068.robot.subsystems.Pipeline;
@@ -22,19 +18,15 @@ import org.usfirst.frc.team4068.robot.subsystems.Sonar;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.opencv.imgproc.Imgproc;
 import edu.wpi.cscore.UsbCamera;
-import edu.wpi.first.wpilibj.vision.VisionPipeline;
 import edu.wpi.first.wpilibj.vision.VisionRunner;
 import edu.wpi.first.wpilibj.vision.VisionThread;
-import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import org.opencv.core.Rect;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.Talon;
-import edu.wpi.first.wpilibj.IterativeRobot;
 
 
 
@@ -90,7 +82,6 @@ public class Robot extends IterativeRobot {
     public void robotInit() {
     	SmartDashboard.putBoolean("Load Auto From File", false);
     	
-    	/*
     	new Thread(){
     		public void run(){
     			while (Robot.this.isAutonomous()&&Robot.this.isEnabled()){
@@ -101,7 +92,6 @@ public class Robot extends IterativeRobot {
     			}
     		}
     	}.start();
-    	*/
     	
     	climber1.setInverted(false);
     	climber2.setInverted(false);
@@ -169,43 +159,32 @@ public class Robot extends IterativeRobot {
 	    		
 	    		mainDrive.drive((Math.abs(x)>.2)?x:0, (Math.abs(y)>.2)?y:0, (Math.abs(r)>.1)?r:0);
 	    		
-	    		Thread.sleep(20);
+	    		
+	    		autoStreamPlayback.read(doubleBuffer);
+	    		//LSB of the double is a boolean for if we should run the launcher
+	    		boolean runLauncher = (doubleBuffer[7] & 0x01) == 0x01;
+	    		
+	    		if (runLauncher){
+	        		mainLauncher.start();
+	        		ballSpinner.set(.7);
+	        	} else {
+	        		mainLauncher.stop();
+	        		ballSpinner.set(0);
+	        	}
+	    		
+	    		double voltage_recorded = ByteBuffer.wrap(doubleBuffer).getDouble();
+	    		double voltage_now = this.m_ds.getBatteryVoltage();
+	    		int ms_delay = (int) Math.round(20f * (voltage_recorded/voltage_now));
+	    		Thread.sleep(ms_delay);
 	    	}
     	}catch (Exception e){
     		e.printStackTrace();
     	}
     	
+    	//set everything to 0 after auto has finished, so that it doesn't run anymore
     	mainDrive.drive(0, 0, 0);
-    	
-    	/*
-    	Timer time = new Timer();
-    	time.start();
-    	autoSelected = (String) chooser.getSelected();
-//		autoSelected = SmartDashboard.getString("Auto Selector", defaultAuto);
-		System.out.println("Auto selected: " + autoSelected);
-		
-		while (time.get() < .7) {
-			mainDrive.drive(0, .6, 0);
-		}
-		mainDrive.drive(0, 0, 0);
-		/*
-		while (time.get() < 2) {
-			mainDrive.drive(-.5, 0, 0);
-		}
-		try {
-			Thread.sleep(3000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		while (time.get() < 8) {
-			mainDrive.drive(.8, 0, 0);
-		}
-		while (time.get() < 9) {
-			mainDrive.drive(0,  .8, 0);
-		}
-		time.stop();
-		*/
+    	mainLauncher.stop();
+    	ballSpinner.set(0);
     }
 
     /**
@@ -256,27 +235,6 @@ public class Robot extends IterativeRobot {
 	    	r = Math.signum(r) * Math.pow(Math.abs(r), exp);
     	}
     	
-
-    	try {
-	    	if (launchStick.getRawButton(3)){
-	    		byte[] bytes = new byte[8];
-	    	    ByteBuffer.wrap(bytes).putDouble(x);
-	    		this.autoStreamRecorder.write(bytes);
-	    		ByteBuffer.wrap(bytes).putDouble(y);
-	    		this.autoStreamRecorder.write(bytes);
-	    		ByteBuffer.wrap(bytes).putDouble(r);
-	    		this.autoStreamRecorder.write(bytes);
-	    	}
-	    	
-	    	if (launchStick.getRawButton(4)){
-	    		FileOutputStream fos = new FileOutputStream("/home/lvuser/Auto.auto");
-	    		fos.write(autoStreamRecorder.toByteArray());
-	    		fos.close();
-	    	}
-    	}catch (Exception e){
-    		e.printStackTrace();
-    	}
-    	
     	
     	mainDrive.drive((Math.abs(x)>.2)?x:0, (Math.abs(y)>.2)?y:0, (Math.abs(r)>.1)?r:0);
     	
@@ -320,6 +278,34 @@ public class Robot extends IterativeRobot {
     		
     		mainDrive.drive(0, 0, 0);
     			
+    	}
+    	
+    	try {
+	    	if (launchStick.getRawButton(3)){
+	    		byte[] bytes = new byte[8];
+	    	    ByteBuffer.wrap(bytes).putDouble(x);
+	    		this.autoStreamRecorder.write(bytes);
+	    		ByteBuffer.wrap(bytes).putDouble(y);
+	    		this.autoStreamRecorder.write(bytes);
+	    		ByteBuffer.wrap(bytes).putDouble(r);
+	    		this.autoStreamRecorder.write(bytes);
+	    		
+	    		ByteBuffer.wrap(bytes).putDouble(getCurrentVoltage());
+	    		if (rightTriggerPressed){
+	    			bytes[7] |= 1 << 0;
+	    		}else{
+	    			bytes[7]  &= ~(1 << 0);
+	    		}
+	    		this.autoStreamRecorder.write(bytes);
+	    	}
+	    	
+	    	if (launchStick.getRawButton(4)){
+	    		FileOutputStream fos = new FileOutputStream("/home/lvuser/Auto.auto");
+	    		fos.write(autoStreamRecorder.toByteArray());
+	    		fos.close();
+	    	}
+    	}catch (Exception e){
+    		e.printStackTrace();
     	}
     	
     }
