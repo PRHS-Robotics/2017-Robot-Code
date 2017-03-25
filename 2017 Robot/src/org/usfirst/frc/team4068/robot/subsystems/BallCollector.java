@@ -3,7 +3,7 @@ package org.usfirst.frc.team4068.robot.subsystems;
 import edu.wpi.first.wpilibj.Talon;
 
 public class BallCollector {
-	Talon motor = new Talon(7);
+	Talon motor = new Talon(4);
 	public BallCollector() {
 		motor.setInverted(true);
 	}
