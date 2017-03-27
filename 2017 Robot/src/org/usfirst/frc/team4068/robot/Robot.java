@@ -3,6 +3,7 @@ package org.usfirst.frc.team4068.robot;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
@@ -18,6 +19,7 @@ import org.usfirst.frc.team4068.robot.subsystems.Sonar;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.opencv.imgproc.Imgproc;
@@ -69,9 +71,12 @@ public class Robot extends IterativeRobot {
     String autoSelected;
     SendableChooser chooser;
  
-    Talon climber1 = new Talon(11);
-    Talon climber2 = new Talon(12);
-    Talon ballSpinner = new Talon(6);
+    Talon climber1 = new Talon(7);
+    Talon climber2 = new Talon(11);
+    Talon ballSpinner = new Talon(8);
+    
+
+	PowerDistributionPanel pdp = new PowerDistributionPanel();
     
     ByteArrayOutputStream autoStreamRecorder;
     boolean autoProgramWritten;
@@ -80,8 +85,8 @@ public class Robot extends IterativeRobot {
      * used for any initialization code.
      */
     public void robotInit() {
-    	SmartDashboard.putBoolean("Load Auto From File", false);
-    	
+    	pdp.clearStickyFaults();
+    	SmartDashboard.putBoolean("Load Auto From File", true);
     	new Thread(){
     		public void run(){
     			while (Robot.this.isAutonomous()&&Robot.this.isEnabled()){
@@ -93,10 +98,11 @@ public class Robot extends IterativeRobot {
     		}
     	}.start();
     	
-    	climber1.setInverted(false);
-    	climber2.setInverted(false);
-    	UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
-    	camera.setResolution(640, 480);
+    	climber1.setInverted(true);
+    	climber2.setInverted(true);
+    	//UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
+    	//camera.setResolution(640, 480);
+    	/*
     	visionThread = new VisionThread(camera, new Pipeline(), new VisionRunner.Listener<Pipeline>() {
     		@Override
     		public void copyPipelineOutputs(Pipeline pipeline) {
@@ -108,10 +114,11 @@ public class Robot extends IterativeRobot {
 	            }
     		}
         });
-    	
+    	*/
     	autoStreamRecorder = new ByteArrayOutputStream();
-    	
+    	/*
     	visionThread.start();
+    	*/
     	//ultra.setAutomaticMode(true);
         chooser = new SendableChooser();
         chooser.addDefault("Default Auto", defaultAuto);
@@ -141,7 +148,7 @@ public class Robot extends IterativeRobot {
     	try {
     		ByteArrayInputStream autoStreamPlayback;
     		if (fileAuto){
-    			Path path = Paths.get("/home/lvuser/Auto.auto");
+    			Path path = Paths.get("/home/lvuser/Auto1.auto");
     			byte[] data = Files.readAllBytes(path);
     			autoStreamPlayback = new ByteArrayInputStream(data);
         	}else{
@@ -191,18 +198,6 @@ public class Robot extends IterativeRobot {
      * This function is called periodically during autonomous
      */
     public void autonomousPeriodic() {
-    	switch(autoSelected) {
-    	case customAuto:
-        //Put custom auto code here
-    		
-            break;
-    	case defaultAuto:
-    	default:
-    	//Put default auto code here
-            break;
-    	}
-    	
-    	
     }
     
     /**
@@ -210,7 +205,7 @@ public class Robot extends IterativeRobot {
      */
     public void teleopPeriodic() {
     	//Rope Climber
-    	double climberSpeed = (-driveStick.getRawAxis(3) + 1) / 2; //convert the range from [-1, 1] to [0, 1]
+    	double climberSpeed = (-(-driveStick.getRawAxis(3) + 1) / 2) * ((launchStick.getRawButton(6))?-1:1); //convert the range from [-1, 1] to [0, 1]
     	climber1.set(climberSpeed);
     	climber2.set(climberSpeed);
     	
@@ -218,9 +213,9 @@ public class Robot extends IterativeRobot {
     	//Drive Train
     	double exp = 1.0;
     	
-    	double x = -driveStick.getAxis(Joystick.AxisType.kX);
+    	double x = -driveStick.getAxis(Joystick.AxisType.kTwist);
     	double y = -driveStick.getAxis(Joystick.AxisType.kY);
-    	double r = driveStick.getAxis(Joystick.AxisType.kTwist);
+    	double r = driveStick.getAxis(Joystick.AxisType.kX);
     	
     	if (driveStick.getRawButton(2)){ //button 2 switches drive controls for the left side to act as the front
 	    	double x_tmp = Math.signum(x) * Math.pow(Math.abs(x), exp);
@@ -251,7 +246,7 @@ public class Robot extends IterativeRobot {
     	//Ball Collector
     	boolean leftTriggerPressed = launchStick.getRawAxis(2) > .5;
     	if (leftTriggerPressed) {
-    		collector.spin(1);
+    		collector.spin(.7);
     	} else {
     		collector.stop();
     	}
@@ -300,7 +295,11 @@ public class Robot extends IterativeRobot {
 	    	}
 	    	
 	    	if (launchStick.getRawButton(4)){
-	    		FileOutputStream fos = new FileOutputStream("/home/lvuser/Auto.auto");
+	    		File f = new File("/home/lvuser/Auto1.auto");
+	    		if(!f.exists()){
+	    			f.createNewFile();
+	    		}
+	    		FileOutputStream fos = new FileOutputStream(f);
 	    		fos.write(autoStreamRecorder.toByteArray());
 	    		fos.close();
 	    	}
