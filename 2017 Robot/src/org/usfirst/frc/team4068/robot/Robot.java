@@ -3,6 +3,7 @@ package org.usfirst.frc.team4068.robot;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
@@ -99,8 +100,9 @@ public class Robot extends IterativeRobot {
     	
     	climber1.setInverted(true);
     	climber2.setInverted(true);
-    	UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
-    	camera.setResolution(640, 480);
+    	//UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
+    	//camera.setResolution(640, 480);
+    	/*
     	visionThread = new VisionThread(camera, new Pipeline(), new VisionRunner.Listener<Pipeline>() {
     		@Override
     		public void copyPipelineOutputs(Pipeline pipeline) {
@@ -112,10 +114,11 @@ public class Robot extends IterativeRobot {
 	            }
     		}
         });
-    	
+    	*/
     	autoStreamRecorder = new ByteArrayOutputStream();
-    	
+    	/*
     	visionThread.start();
+    	*/
     	//ultra.setAutomaticMode(true);
         chooser = new SendableChooser();
         chooser.addDefault("Default Auto", defaultAuto);
@@ -145,7 +148,7 @@ public class Robot extends IterativeRobot {
     	try {
     		ByteArrayInputStream autoStreamPlayback;
     		if (fileAuto){
-    			Path path = Paths.get("/home/lvuser/Auto.auto");
+    			Path path = Paths.get("/home/lvuser/Auto1.auto");
     			byte[] data = Files.readAllBytes(path);
     			autoStreamPlayback = new ByteArrayInputStream(data);
         	}else{
@@ -292,7 +295,11 @@ public class Robot extends IterativeRobot {
 	    	}
 	    	
 	    	if (launchStick.getRawButton(4)){
-	    		FileOutputStream fos = new FileOutputStream("/home/lvuser/Auto.auto");
+	    		File f = new File("/home/lvuser/Auto1.auto");
+	    		if(!f.exists()){
+	    			f.createNewFile();
+	    		}
+	    		FileOutputStream fos = new FileOutputStream(f);
 	    		fos.write(autoStreamRecorder.toByteArray());
 	    		fos.close();
 	    	}
